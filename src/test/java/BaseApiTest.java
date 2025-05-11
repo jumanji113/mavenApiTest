@@ -1,2 +1,20 @@
-package PACKAGE_NAME;public class BaseApiTest {
+
+import io.restassured.RestAssured;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import listeners.CustomTpl;
+import org.junit.jupiter.api.BeforeAll;
+
+import java.util.Random;
+
+public class BaseApiTest {
+
+    protected static Random random = new Random();
+
+    @BeforeAll
+    public static void setUp(){
+        RestAssured.baseURI = "http://85.192.34.140:8080";
+        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter(),
+                CustomTpl.customLogFilter().withCustomTemplates());
+    }
 }
