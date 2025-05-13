@@ -1,15 +1,18 @@
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import models.JwtAuth;
 import models.User;
 import models.info.ErrorInfoAuth;
 import models.info.Info;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("api")
 public class UserApiTests extends BaseApiTest {
@@ -92,7 +95,7 @@ public class UserApiTests extends BaseApiTest {
                 .jsonPath()
                 .getString("token");
 
-        Assertions.assertNotNull(token);
+        assertNotNull(token);
     }
 
     @Test
@@ -111,7 +114,7 @@ public class UserApiTests extends BaseApiTest {
                 .extract()
                 .as(ErrorInfoAuth.class);
 
-        Assertions.assertEquals(ERROR_UNAUTHORIZED, errorInfoAuth.getError());
+        assertEquals(ERROR_UNAUTHORIZED, errorInfoAuth.getError());
     }
 
     @Test
@@ -147,8 +150,109 @@ public class UserApiTests extends BaseApiTest {
                 .extract()
                 .as(User.class);
 
-        Assertions.assertEquals(user.getLogin(), userInfo.getLogin());
-        Assertions.assertEquals(user.getPass(), userInfo.getPass());
+        assertEquals(user.getLogin(), userInfo.getLogin());
+        assertEquals(user.getPass(), userInfo.getPass());
     }
+
+    @Test
+    @DisplayName("Проверка обновления пароля пользователя")
+    public void positiveUpdatePassUser() {
+        int randomNumber = Math.abs(random.nextInt(10000));
+        User user = User.builder().login("alex" + randomNumber).pass("human" + randomNumber).build();
+        String oldPass = user.getPass();
+
+        given().contentType(ContentType.JSON)
+                .body(user)
+                .post("/api/signup")
+                .then()
+                .statusCode(201);
+
+        JwtAuth jwtAuth = new JwtAuth(user.getPass(), user.getLogin());
+
+        String token = given().contentType(ContentType.JSON)
+                .body(jwtAuth)
+                .post("/api/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getString("token");
+
+        HashMap<String, String> pass = new HashMap<>();
+        pass.put("password", "juman" + random.nextInt(10000));
+
+        Map<String, String> map = given()
+                .contentType(ContentType.JSON)
+                .auth()
+                .oauth2(token)
+                .body(pass)
+                .put("/api/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getObject("info", new TypeRef<>() {
+                });
+
+        assertEquals("success", map.get("status"));
+        assertEquals("User password successfully changed", map.get("message"));
+
+        JwtAuth jwtAuthNew = new JwtAuth(pass.get("password"), user.getLogin());
+
+        String tokenNew = given().contentType(ContentType.JSON)
+                .body(jwtAuthNew)
+                .post("/api/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getString("token");
+
+        User userInfo = given()
+                .auth()
+                .oauth2(tokenNew)
+                .get("/api/user")
+                .then()
+                .extract()
+                .as(User.class);
+
+        assertNotEquals(oldPass, userInfo.getPass());
+
+    }
+
+    @Test
+    @DisplayName("Негативный тест на изменение пароля админа")
+    public void negativeUpdateAdmin() {
+        JwtAuth jwtAuth = new JwtAuth("admin", "admin");
+
+        String token = given().contentType(ContentType.JSON)
+                .body(jwtAuth)
+                .post("/api/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getString("token");
+
+        JwtAuth jwtAuth1 = JwtAuth.builder().password("pass" + random.nextInt(100)).build();
+
+        Map<String, String> errorInfo = given()
+                .contentType(ContentType.JSON)
+                .auth()
+                .oauth2(token)
+                .body(jwtAuth1)
+                .put("/api/user")
+                .then()
+                .extract()
+                .jsonPath()
+                .getObject("info", new TypeRef<>() {
+                });
+
+        assertEquals("fail", errorInfo.get("status"));
+        assertEquals("Cant update base users", errorInfo.get("message"));
+    }
+
+    @Test
+    @DisplayName("Негативный тест на удаление пользователя Админа")
 
 }
