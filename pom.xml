@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>bft.schol</groupId>
-    <artifactId>threadQastep4</artifactId>
+    <artifactId>mvnApiTest</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

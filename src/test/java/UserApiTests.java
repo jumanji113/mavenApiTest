@@ -252,7 +252,7 @@ public class UserApiTests extends BaseApiTest {
         assertEquals("Cant update base users", errorInfo.get("message"));
     }
 
-    @Test
-    @DisplayName("Негативный тест на удаление пользователя Админа")
+    //@Test
+    //@DisplayName("Негативный тест на удаление пользователя Админа")
 
 }

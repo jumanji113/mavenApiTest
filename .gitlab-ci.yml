@@ -1,0 +1,14 @@
+image: maven:3.8-openjdk11
+default:
+  tags:
+    -macJumanji
+stages:
+  - test
+Integration test with allure:
+  stage: test
+  script:
+    - mvn clean test
+    - mvn allure:report
+  artifacts:
+    paths:
+      - target/allure-results
