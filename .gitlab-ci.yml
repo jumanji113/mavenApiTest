@@ -1,4 +1,4 @@
-image: maven:3.9.9-openjdk17
+image: maven:3.8-openjdk-11
 default:
   tags:
     - macJumanji
