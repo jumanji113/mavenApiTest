@@ -1,7 +1,7 @@
 image: maven:3.8-openjdk11
 default:
   tags:
-    -macJumanji
+    - macJumanji
 stages:
   - test
 Integration test with allure:
