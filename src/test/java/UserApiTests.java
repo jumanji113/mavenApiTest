@@ -1,5 +1,6 @@
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import models.JwtAuth;
 import models.User;
 import models.info.ErrorInfoAuth;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -157,6 +159,7 @@ public class UserApiTests extends BaseApiTest {
     @Test
     @DisplayName("Проверка обновления пароля пользователя")
     public void positiveUpdatePassUser() {
+
         int randomNumber = Math.abs(random.nextInt(10000));
         User user = User.builder().login("alex" + randomNumber).pass("human" + randomNumber).build();
         String oldPass = user.getPass();
@@ -217,12 +220,12 @@ public class UserApiTests extends BaseApiTest {
                 .as(User.class);
 
         assertNotEquals(oldPass, userInfo.getPass());
-
     }
 
     @Test
     @DisplayName("Негативный тест на изменение пароля админа")
     public void negativeUpdateAdmin() {
+
         JwtAuth jwtAuth = new JwtAuth("admin", "admin");
 
         String token = given().contentType(ContentType.JSON)
@@ -255,7 +258,8 @@ public class UserApiTests extends BaseApiTest {
     @Test
     @Tag("negativeUserTest")
     @DisplayName("Негативный тест на удаление пользователя Админа")
-    public void deleteAdminUser(){
+    public void deleteAdminUser() {
+
         JwtAuth jwtAuth = new JwtAuth("admin", "admin");
 
         String token = given().contentType(ContentType.JSON)
@@ -283,7 +287,8 @@ public class UserApiTests extends BaseApiTest {
     @Test
     @Tag("positiveUserTest")
     @DisplayName("Позитивный тест на удаление пользователя")
-    public void postiveDeleteUser(){
+    public void postiveDeleteUser() {
+
         int randomNumber = Math.abs(random.nextInt(10000));
         User user = User.builder().login("alex" + randomNumber).pass("human" + randomNumber).build();
         String oldPass = user.getPass();
@@ -314,10 +319,26 @@ public class UserApiTests extends BaseApiTest {
                 .extract()
                 .jsonPath()
                 .getObject("info", Info.class);
+
         assertEquals("success", info.getStatus());
         assertEquals("User successfully deleted", info.getMessage());
     }
 
+    @Test
+    @Tag("positiveUserTest")
+    @DisplayName("Позитивный тест на получение всех пользователей")
+    public void getAllUsers() {
 
+        List<String> users = given().get("/api/users")
+                .then()
+                .statusCode(200)
+                .extract()
+                .as(new TypeRef<List<String>>() {
+                });
+
+        users = users.stream().filter(x -> x.contains("alex")).toList();
+        //users = users.stream().filter(x->x.length() > 5).toList();
+        assertFalse(users.isEmpty());
+    }
 
 }
