@@ -252,7 +252,72 @@ public class UserApiTests extends BaseApiTest {
         assertEquals("Cant update base users", errorInfo.get("message"));
     }
 
-    //@Test
-    //@DisplayName("Негативный тест на удаление пользователя Админа")
+    @Test
+    @Tag("negativeUserTest")
+    @DisplayName("Негативный тест на удаление пользователя Админа")
+    public void deleteAdminUser(){
+        JwtAuth jwtAuth = new JwtAuth("admin", "admin");
+
+        String token = given().contentType(ContentType.JSON)
+                .body(jwtAuth)
+                .post("/api/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getString("token");
+
+        Info info = given()
+                .auth()
+                .oauth2(token)
+                .delete("/api/user")
+                .then()
+                .statusCode(400)
+                .extract()
+                .jsonPath()
+                .getObject("info", Info.class);
+        assertEquals("fail", info.getStatus());
+        assertEquals("Cant delete base users", info.getMessage());
+    }
+
+    @Test
+    @Tag("positiveUserTest")
+    @DisplayName("Позитивный тест на удаление пользователя")
+    public void postiveDeleteUser(){
+        int randomNumber = Math.abs(random.nextInt(10000));
+        User user = User.builder().login("alex" + randomNumber).pass("human" + randomNumber).build();
+        String oldPass = user.getPass();
+
+        given().contentType(ContentType.JSON)
+                .body(user)
+                .post("/api/signup")
+                .then()
+                .statusCode(201);
+
+        JwtAuth jwtAuth = new JwtAuth(user.getPass(), user.getLogin());
+
+        String token = given().contentType(ContentType.JSON)
+                .body(jwtAuth)
+                .post("/api/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getString("token");
+
+        Info info = given()
+                .auth()
+                .oauth2(token)
+                .delete("api/user")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getObject("info", Info.class);
+        assertEquals("success", info.getStatus());
+        assertEquals("User successfully deleted", info.getMessage());
+    }
+
+
 
 }
