@@ -1,5 +1,6 @@
 package assertions;
 
+import assertions.conditions.ErrorCondition;
 import assertions.conditions.MessageCondition;
 import assertions.conditions.StatusCodeCondition;
 import assertions.conditions.StatusCondition;
@@ -15,5 +16,9 @@ public class Conditions {
 
     public static StatusCodeCondition haseStatusCode(Integer expectedStatusCode){
         return new StatusCodeCondition(expectedStatusCode);
+    }
+
+    public static ErrorCondition haseMessageError(String expectedErrorMessage){
+        return new ErrorCondition(expectedErrorMessage);
     }
 }
