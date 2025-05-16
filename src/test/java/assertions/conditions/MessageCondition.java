@@ -14,7 +14,6 @@ public class MessageCondition implements Condition {
 
     @Override
     public void check(ValidatableResponse response) {
-
         Info info = response.extract().jsonPath().getObject("info", Info.class);
         assertEquals(expectedMessage, info.getMessage());
     }

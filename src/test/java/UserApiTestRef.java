@@ -72,6 +72,7 @@ public class UserApiTestRef extends BaseApiTest {
     public void positiveAuthAdmin() {
         User user = getAdminUser();
         String token = userService.auth(user).asJwt();
+
         assertNotNull(token);
     }
 
@@ -83,6 +84,7 @@ public class UserApiTestRef extends BaseApiTest {
 
         userService.register(user);
         String token = userService.auth(user).asJwt();
+
         assertNotNull(token);
     }
 
@@ -101,12 +103,11 @@ public class UserApiTestRef extends BaseApiTest {
     @Tag("positiveUserTest")
     @DisplayName("Позитивный тест на получение данных пользователя по токену")
     public void postitveGetUser() {
-
         User user = getRandomUser();
         userService.register(user)
-                        .should(haseStatusCode(USER_CREATED_STATUS_CODE));
+                .should(haseStatusCode(USER_CREATED_STATUS_CODE));
 
-        String token  = userService.auth(user)
+        String token = userService.auth(user)
                 .asJwt();
 
         userService.getUserInfo(token)
