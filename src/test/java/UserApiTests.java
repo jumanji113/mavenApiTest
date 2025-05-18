@@ -1,6 +1,5 @@
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import models.JwtAuth;
 import models.User;
 import models.info.ErrorInfoAuth;

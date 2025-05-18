@@ -10,8 +10,8 @@ import java.util.Random;
 
 public class BaseApiTest {
 
-    protected static Random random;
-    protected static UserService userService;
+    public static Random random;
+    public static UserService userService;
 
     @BeforeAll
     public static void setUp(){

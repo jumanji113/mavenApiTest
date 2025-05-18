@@ -1,6 +1,7 @@
 package services;
 
 import assertions.AssertableResponse;
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import models.User;
 import models.JwtAuth;

@@ -3,18 +3,17 @@ package assertions.conditions;
 import assertions.Condition;
 import io.restassured.response.ValidatableResponse;
 import lombok.RequiredArgsConstructor;
-import models.info.ErrorInfoAuth;
-
+import models.info.Info;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RequiredArgsConstructor
-public class ErrorCondition implements Condition {
+public class StatusCondition implements Condition {
 
-    private final String expectedMessage;
+    private final String expectedStatus;
 
     @Override
     public void check(ValidatableResponse response) {
-        ErrorInfoAuth errorInfoAuth = response.extract().as(ErrorInfoAuth.class);
-        assertEquals(expectedMessage, errorInfoAuth.getError());
+        Info infoResult = response.extract().jsonPath().getObject("info", Info.class);
+        assertEquals(expectedStatus, infoResult.getStatus());
     }
 }
