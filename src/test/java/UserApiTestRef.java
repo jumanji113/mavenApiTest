@@ -12,7 +12,6 @@ public class UserApiTestRef extends BaseApiTest {
     private static final String USER_CREATED_STATUS = "success";
     private static final Integer USER_CREATED_STATUS_CODE = 201;
     private static final Integer GET_USER_POSITIVE = 200;
-    private static final Integer USER_FAIL_CREATED_STATUS_CODE = 400;
 
     public User getRandomUser() {
         int randomNumber = Math.abs(BaseApiTest.random.nextInt());
@@ -103,22 +102,6 @@ public class UserApiTestRef extends BaseApiTest {
                 .as(User.class);
 
         assertNotEquals(oldPass, userInfo.getPass());
-    }
-
-    @Test
-    @Tag("negativeUserTest")
-    @DisplayName("Негативный тест на удаление пользователя Админа")
-    public void deleteAdminUser() {
-        User user = getAdminUser();
-
-        String token = userService.auth(user)
-                .should(haseStatusCode(GET_USER_POSITIVE))
-                .asJwt();
-
-        userService.deleteUser(token)
-                .should(haseMessage("Cant delete base users"))
-                .should(haseStatus("fail"))
-                .should(haseStatusCode(USER_FAIL_CREATED_STATUS_CODE));
     }
 
     @Test

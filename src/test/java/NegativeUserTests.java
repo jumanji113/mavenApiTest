@@ -14,6 +14,7 @@ public class NegativeUserTests extends BaseApiTest{
     private static final Integer USER_CREATED_STATUS_CODE = 201;
     private static final Integer USER_FAIL_CREATED_STATUS_CODE = 400;
     private static final Integer USER_FAIL_AUTH = 401;
+    private static final Integer GET_USER_POSITIVE = 200;
 
     public User getRandomUser() {
         int randomNumber = Math.abs(BaseApiTest.random.nextInt());
@@ -54,6 +55,23 @@ public class NegativeUserTests extends BaseApiTest{
         userService.auth(user)
                 .should(haseStatusCode(USER_FAIL_AUTH))
                 .should(haseMessageError(ERROR_UNAUTHORIZED));
+    }
+
+
+    @Test
+    @Tag("negativeUserTest")
+    @DisplayName("Негативный тест на удаление пользователя Админа")
+    public void deleteAdminUser() {
+        User user = getAdminUser();
+
+        String token = userService.auth(user)
+                .should(haseStatusCode(GET_USER_POSITIVE))
+                .asJwt();
+
+        userService.deleteUser(token)
+                .should(haseMessage("Cant delete base users"))
+                .should(haseStatus("fail"))
+                .should(haseStatusCode(USER_FAIL_CREATED_STATUS_CODE));
     }
 
     @Test
