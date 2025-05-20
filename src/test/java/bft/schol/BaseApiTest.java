@@ -1,9 +1,11 @@
+package bft.schol;
 
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import listeners.CustomTpl;
 import org.junit.jupiter.api.BeforeAll;
+import services.FileService;
 import services.UserService;
 
 import java.util.Random;
@@ -12,6 +14,7 @@ public class BaseApiTest {
 
     public static Random random;
     public static UserService userService;
+    public static FileService fileService;
 
     @BeforeAll
     public static void setUp(){
@@ -20,5 +23,6 @@ public class BaseApiTest {
                 CustomTpl.customLogFilter().withCustomTemplates());
         random = new Random();
         userService = new UserService();
+        fileService = new FileService();
     }
 }

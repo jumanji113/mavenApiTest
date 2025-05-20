@@ -1,3 +1,8 @@
+package bft.schol.negativeUserTests;
+
+import bft.schol.ApiResponseConstants;
+import bft.schol.BaseApiTest;
+import io.qameta.allure.Epic;
 import models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -5,16 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import static assertions.Conditions.*;
 import static assertions.Conditions.haseStatusCode;
+import static bft.schol.ApiResponseConstants.*;
 
-public class NegativeUserTests extends BaseApiTest{
-
-    private static final String USER_FAIL_CREATED_MESSAGE = "Login already exist";
-    private static final String USER_FAIL_CREATED_STATUS = "fail";
-    private static final String ERROR_UNAUTHORIZED = "Unauthorized";
-    private static final Integer USER_CREATED_STATUS_CODE = 201;
-    private static final Integer USER_FAIL_CREATED_STATUS_CODE = 400;
-    private static final Integer USER_FAIL_AUTH = 401;
-    private static final Integer GET_USER_POSITIVE = 200;
+@Epic("Негативные Api тесты")
+public class NegativeUserTests extends BaseApiTest {
 
     public User getRandomUser() {
         int randomNumber = Math.abs(BaseApiTest.random.nextInt());
@@ -38,12 +37,12 @@ public class NegativeUserTests extends BaseApiTest{
         User user = getRandomUser();
 
         userService.register(user)
-                .should(haseStatusCode(USER_CREATED_STATUS_CODE));
+                .should(haseStatusCode(USER_CREATED.getStatusCode()));
 
         userService.register(user)
-                .should(haseMessage(USER_FAIL_CREATED_MESSAGE))
-                .should(haseStatus(USER_FAIL_CREATED_STATUS))
-                .should(haseStatusCode(USER_FAIL_CREATED_STATUS_CODE));
+                .should(haseMessage(LOGIN_ALREADY_EXISTS.getMessage()))
+                .should(haseStatus(LOGIN_ALREADY_EXISTS.getStatus()))
+                .should(haseStatusCode(LOGIN_ALREADY_EXISTS.getStatusCode()));
     }
 
     @Test
@@ -53,8 +52,8 @@ public class NegativeUserTests extends BaseApiTest{
         User user = getRandomUser();
 
         userService.auth(user)
-                .should(haseStatusCode(USER_FAIL_AUTH))
-                .should(haseMessageError(ERROR_UNAUTHORIZED));
+                .should(haseStatusCode(ApiResponseConstants.UNAUTHORIZED.getStatusCode()))
+                .should(haseMessageError(ApiResponseConstants.UNAUTHORIZED.getMessage()));
     }
 
 
@@ -65,13 +64,13 @@ public class NegativeUserTests extends BaseApiTest{
         User user = getAdminUser();
 
         String token = userService.auth(user)
-                .should(haseStatusCode(GET_USER_POSITIVE))
+                .should(haseStatusCode(GET_USER_POSITIVE.getStatusCode()))
                 .asJwt();
 
         userService.deleteUser(token)
-                .should(haseMessage("Cant delete base users"))
-                .should(haseStatus("fail"))
-                .should(haseStatusCode(USER_FAIL_CREATED_STATUS_CODE));
+                .should(haseMessage(CANT_DELETE_BASE_USERS.getMessage()))
+                .should(haseStatus(CANT_DELETE_BASE_USERS.getStatus()))
+                .should(haseStatusCode(CANT_DELETE_BASE_USERS.getStatusCode()));
     }
 
     @Test
@@ -86,6 +85,6 @@ public class NegativeUserTests extends BaseApiTest{
         userService.updatePass(updatedPass, token)
                 .should(haseMessage("Cant update base users"))
                 .should(haseStatus("fail"))
-                .should(haseStatusCode(USER_FAIL_CREATED_STATUS_CODE));
+                .should(haseStatusCode(CANT_UPDATE_BASE_USERS.getStatusCode()));
     }
 }

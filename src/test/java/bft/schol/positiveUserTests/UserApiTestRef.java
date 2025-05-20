@@ -1,17 +1,21 @@
+package bft.schol.positiveUserTests;
+
+import bft.schol.BaseApiTest;
+import io.qameta.allure.Epic;
 import models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static assertions.Conditions.*;
+import static bft.schol.ApiResponseConstants.GET_USER_POSITIVE;
+import static bft.schol.ApiResponseConstants.USER_CREATED;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Epic("Позитивные Api тесты")
 public class UserApiTestRef extends BaseApiTest {
-
-    private static final String USER_CREATED_MESSAGE = "User created";
-    private static final String USER_CREATED_STATUS = "success";
-    private static final Integer USER_CREATED_STATUS_CODE = 201;
-    private static final Integer GET_USER_POSITIVE = 200;
 
     public User getRandomUser() {
         int randomNumber = Math.abs(BaseApiTest.random.nextInt());
@@ -35,9 +39,9 @@ public class UserApiTestRef extends BaseApiTest {
         User user = getRandomUser();
 
         userService.register(user)
-                .should(haseStatusCode(USER_CREATED_STATUS_CODE))
-                .should(haseMessage(USER_CREATED_MESSAGE))
-                .should(haseStatus(USER_CREATED_STATUS));
+                .should(haseStatusCode(USER_CREATED.getStatusCode()))
+                .should(haseMessage(USER_CREATED.getMessage()))
+                .should(haseStatus(USER_CREATED.getStatus()));
     }
 
     @Test
@@ -68,13 +72,13 @@ public class UserApiTestRef extends BaseApiTest {
     public void postitveGetUser() {
         User user = getRandomUser();
         userService.register(user)
-                .should(haseStatusCode(USER_CREATED_STATUS_CODE));
+                .should(haseStatusCode(USER_CREATED.getStatusCode()));
 
         String token = userService.auth(user)
                 .asJwt();
 
         userService.getUserInfo(token)
-                .should(haseStatusCode(GET_USER_POSITIVE));
+                .should(haseStatusCode(GET_USER_POSITIVE.getStatusCode()));
     }
 
     @Test
@@ -91,7 +95,7 @@ public class UserApiTestRef extends BaseApiTest {
 
         String newPass = "human" + random.nextInt(1000);
         userService.updatePass(newPass, token)
-                .should(haseStatusCode(GET_USER_POSITIVE))
+                .should(haseStatusCode(GET_USER_POSITIVE.getStatusCode()))
                 .should(haseMessage("User password successfully changed"));
 
         user.setPass(newPass);
@@ -111,14 +115,14 @@ public class UserApiTestRef extends BaseApiTest {
         User user = getRandomUser();
 
         userService.register(user)
-                .should(haseStatusCode(USER_CREATED_STATUS_CODE));
+                .should(haseStatusCode(USER_CREATED.getStatusCode()));
 
         String token = userService.auth(user)
-                .should(haseStatusCode(GET_USER_POSITIVE))
+                .should(haseStatusCode(GET_USER_POSITIVE.getStatusCode()))
                 .asJwt();
 
         userService.deleteUser(token)
-                .should(haseStatusCode(GET_USER_POSITIVE))
+                .should(haseStatusCode(GET_USER_POSITIVE.getStatusCode()))
                 .should(haseMessage("User successfully deleted"));
     }
 
